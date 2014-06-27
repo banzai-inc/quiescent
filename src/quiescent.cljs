@@ -79,6 +79,30 @@
             (this-as this
               (when-let [f (aget (.-props this) "onWillUnmount")]
                 (binding [*component* this]
+                  (f)))))
+          :componentWillEnter
+          (fn [callback]
+            (this-as this
+              (when-let [f (aget (.-props this) "onWillEnter")]
+                (binding [*component* this]
+                  (f (.getDOMNode this) callback)))))
+          :componentDidEnter
+          (fn []
+            (this-as this
+              (when-let [f (aget (.-props this) "onEnter")]
+                (binding [*component* this]
+                  (f (.getDOMNode this))))))
+          :componentWillLeave
+          (fn [callback]
+            (this-as this
+              (when-let [f (aget (.-props this) "onWillLeave")]
+                (binding [*component* this]
+                  (f (.getDOMNode this) callback)))))
+          :componentDidLeave
+          (fn []
+            (this-as this
+              (when-let [f (aget (.-props this) "onLeave")]
+                (binding [*component* this]
                   (f)))))}))
 
 (defn wrapper
@@ -94,7 +118,16 @@
              passing the rendered DOM node as a single arg
   :onWillUpdate - will call the provided function with no arguments
   :onWillMount - will call the provided function with no arguments
-  :onWillUnmount - will call the provided function with no arguments"
+  :onWillUnmount - will call the provided function with no arguments
+  :onWillEnter - will call the provided function,
+                 passing the rendered DOM node and a callback which
+                 can trigger :onEnter
+  :onEnter - will call the provided function,
+             passing the rendered DOM node as a single arg
+  :onWillLeave - will call the provided function,
+                 passing the rendered DOM node and a callback which
+                 can trigger :onLeave
+  :onLeave - will call the provided function with no arguments"
   [child & kvs]
   (let [props (js-props (apply array-map :wrappee child kvs))]
     (when-let [key (aget (.-props child) "key")]
@@ -125,7 +158,6 @@
   [child f]
   (wrapper child :onMount f :onUpdate f))
 
-
 (defn on-will-mount
   "Wrap a component, specifying a function to be called on the
   componentWillMount lifecycle event.
@@ -150,7 +182,6 @@
   [child f]
   (wrapper child :onWillMount f :onWillUpdate f))
 
-
 (defn on-will-unmount
   "Wrap a component, specifying a function to be called on the
   componentWillUnmount lifecycle event.
@@ -158,6 +189,38 @@
   The function will be called with no arguments."
   [child f]
   (wrapper child :onWillUnmount f))
+
+(defn on-will-enter
+  "Wrap a component, specifying a function to be called on the
+  componentWillEnter lifecycle event of the ReactTransitionGroup.
+
+  The function will be called with no arguments."
+  [child f]
+  (wrapper child :onWillEnter f))
+
+(defn on-enter
+  "Wrap a component, specifying a function to be called on the
+  componentDidEnter lifecycle event of the ReactTransitionGroup.
+
+  The function will be called with no arguments."
+  [child f]
+  (wrapper child :onEnter f))
+
+(defn on-will-leave
+  "Wrap a component, specifying a function to be called on the
+  componentWillLeave lifecycle event of the ReactTransitionGroup.
+
+  The function will be called with no arguments."
+  [child f]
+  (wrapper child :onWillLeave f))
+
+(defn on-leave
+  "Wrap a component, specifying a function to be called on the
+  componentDidLeave lifecycle event of the ReactTransitionGroup.
+
+  The function will be called with no arguments."
+  [child f]
+  (wrapper child :onLeave f))
 
 (defn render
   "Given a ReactJS component, immediately render it, rooted to the

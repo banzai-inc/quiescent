@@ -263,6 +263,8 @@ To use this functionality, use the `quiescent/wrapper`, passing the wrapped
 component as the first argument and any number of lifecycle ID/handler
 function pairs as additional arguments. Valid lifecycle IDs include: 
 `:onUpdate`, `:onMount`, `:onWillUpdate`, `:onWillMount`, and `:onWillUnmount`.
+Additional lifecycle IDs are provided for the `ReactTransitionGroup` addon:
+`:onWillEnter`, `:onEnter`, `:onWillLeave`, and `:onLeave`.
  
 For example:
  
